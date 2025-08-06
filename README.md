@@ -13,6 +13,35 @@ This pipeline:
 3. Performs img2img generation for each image
 4. Saves output to `data/output_images` directory
 
+## Fork Updates
+
+This fork includes several significant improvements to enhance functionality, reliability, and user experience:
+
+#### **Enhanced CLI Interface**
+- Added configurable parameters for fine-tuning generation:
+  - `--strength` (0.0-1.0): Controls how much to transform the original image
+  - `--guidance-scale`: Controls prompt adherence strength  
+  - `--num-inference-steps`: Controls generation quality vs speed
+  - `--output-filename`: Custom output filename control
+
+#### **Cross-Platform Device Support**
+- **Apple Silicon (M1/M2) Support**: Added native MPS (Metal Performance Shaders) acceleration
+- **Improved CPU Fallback**: Graceful degradation when GPU acceleration unavailable
+- **Device-Aware Configuration**: Automatic detection and optimization for CUDA/MPS/CPU
+- **Data Type Optimization**: Uses float32 for MPS/CPU to prevent black image artifacts
+
+#### **Intelligent Output Management**
+- **Smart Filename Generation**: Auto-generates descriptive filenames including all parameters
+  - Example: `image_van_gogh_style_str0.7_guide18.0_steps40_stable_diffusion_v1_5.jpg`
+- **Parameter Preservation**: Filenames encode generation settings for reproducibility
+- **Collision Prevention**: Unique names prevent accidental overwrites
+
+#### **Robustness & Error Handling**
+- **Graceful Memory Management**: Improved error handling for memory optimization features
+- **Dependency Compatibility**: Fixed typer/click version conflicts
+- **Input Validation**: Better image preprocessing and format handling
+- **Comprehensive Logging**: Detailed debug information for troubleshooting
+
 ## Run it locally
 
 **Set up python environment**
@@ -120,34 +149,6 @@ to run it. This can be seen in [commands/main.py](./src/img2img_pipeline/command
 
 The current `main.py` is put inside a `commands` module because we might want to add an `api/` folder using the same modules to create a Stable Diffusion API service. Finally, The `typer` library has been used to implement the CLI command for running the pipeline as it is very simple and easily extensible.
 
-### Fork Updates
-
-This fork includes several significant improvements to enhance functionality, reliability, and user experience:
-
-#### **Enhanced CLI Interface**
-- Added configurable parameters for fine-tuning generation:
-  - `--strength` (0.0-1.0): Controls how much to transform the original image
-  - `--guidance-scale`: Controls prompt adherence strength  
-  - `--num-inference-steps`: Controls generation quality vs speed
-  - `--output-filename`: Custom output filename control
-
-#### **Cross-Platform Device Support**
-- **Apple Silicon (M1/M2) Support**: Added native MPS (Metal Performance Shaders) acceleration
-- **Improved CPU Fallback**: Graceful degradation when GPU acceleration unavailable
-- **Device-Aware Configuration**: Automatic detection and optimization for CUDA/MPS/CPU
-- **Data Type Optimization**: Uses float32 for MPS/CPU to prevent black image artifacts
-
-#### **Intelligent Output Management**
-- **Smart Filename Generation**: Auto-generates descriptive filenames including all parameters
-  - Example: `image_van_gogh_style_str0.7_guide18.0_steps40_stable_diffusion_v1_5.jpg`
-- **Parameter Preservation**: Filenames encode generation settings for reproducibility
-- **Collision Prevention**: Unique names prevent accidental overwrites
-
-#### **Robustness & Error Handling**
-- **Graceful Memory Management**: Improved error handling for memory optimization features
-- **Dependency Compatibility**: Fixed typer/click version conflicts
-- **Input Validation**: Better image preprocessing and format handling
-- **Comprehensive Logging**: Detailed debug information for troubleshooting
 
 ### Work towards increasing GPU memory efficiency
 
