@@ -1,9 +1,9 @@
  # img2img-pipeline
 
 Stable Diffusion img2img pipeline, supporting various models and images and 
-tested on NVIDIA / CUDA devices.
+tested on NVIDIA / CUDA / MPS devices.
 
-![repo banner](data/expressionistic_cat.jpg)
+![repo banner](data/van_gogh_dolomiti_runner.jpg)
 
 This pipeline:
 
@@ -16,16 +16,30 @@ This pipeline:
 
 **Set up python environment**
 
-It is required to have Python3.8, CUDA, and Pytorch installed on the system
+This pipeline supports multiple platforms and acceleration methods:
+- **NVIDIA/CUDA**: Original GPU acceleration (requires CUDA-enabled PyTorch)
+- **Apple Silicon (M1/M2)**: Native MPS acceleration
+- **CPU**: Fallback support for any system
 
 Install requirements
 ```
 pip install -r requirements.txt
 ```
-You must have CUDA enabled pytorch. You can check by running the following
-```
+
+**For NVIDIA GPU users:**
+You must have CUDA enabled pytorch. You can check by running:
+```python
 import torch; print(torch.cuda.is_available())
 ```
+
+**For Apple Silicon users:**
+MPS acceleration is automatically detected. You can verify by running:
+```python
+import torch; print(torch.backends.mps.is_available())
+```
+
+**For CPU-only systems:**
+The pipeline will automatically fall back to CPU processing.
 
 **Add images to the `data/input_images` directory
 ```
@@ -43,11 +57,32 @@ Or on a specific image by providing the `[filename]` and extra arguments
 ```
 python -m src.img2img_pipeline.commands.main run_single_image_pipeline example_image.png --prompt "in the style of picasso" --model "stabilityai/stable-diffusion-2"
 ```
+
+**Advanced usage with all parameters:**
+```
+python -m src.img2img_pipeline.commands.main run_single_image_pipeline example_image.png \
+  --prompt "Van Gogh painting with thick brushstrokes" \
+  --model "runwayml/stable-diffusion-v1-5" \
+  --strength 0.7 \
+  --guidance-scale 18.0 \
+  --num-inference-steps 40 \
+  --output-filename "my_van_gogh_masterpiece.jpg"
+```
+
 There are a list of prompts and models in `src/constants.py`. If `--filename` or `--prompt` are not provided,
 a default is chosen from the lists. In which case, the command can be simplified into
 ```
 python -m src.img2img_pipeline.commands.main run_single_image_pipeline example_image.png
 ```
+
+**Parameter Guidelines:**
+- `--strength 0.1-0.4`: Subtle style transfer, preserves original content
+- `--strength 0.5-0.7`: Balanced artistic transformation  
+- `--strength 0.8-1.0`: Dramatic style changes, may lose original details
+- `--guidance-scale 10-15`: Standard prompt following
+- `--guidance-scale 16-25`: Strong prompt adherence for specific styles
+- `--num-inference-steps 15-25`: Fast generation
+- `--num-inference-steps 30-50`: High quality results
 
 ## Project Structure
 ```
@@ -84,6 +119,34 @@ to run it. This can be seen in [commands/main.py](./src/img2img_pipeline/command
 
 The current `main.py` is put inside a `commands` module because we might want to add an `api/` folder using the same modules to create a Stable Diffusion API service. Finally, The `typer` library has been used to implement the CLI command for running the pipeline as it is very simple and easily extensible.
 
+### Fork Updates
+
+This fork includes several significant improvements to enhance functionality, reliability, and user experience:
+
+#### **Enhanced CLI Interface**
+- Added configurable parameters for fine-tuning generation:
+  - `--strength` (0.0-1.0): Controls how much to transform the original image
+  - `--guidance-scale`: Controls prompt adherence strength  
+  - `--num-inference-steps`: Controls generation quality vs speed
+  - `--output-filename`: Custom output filename control
+
+#### **Cross-Platform Device Support**
+- **Apple Silicon (M1/M2) Support**: Added native MPS (Metal Performance Shaders) acceleration
+- **Improved CPU Fallback**: Graceful degradation when GPU acceleration unavailable
+- **Device-Aware Configuration**: Automatic detection and optimization for CUDA/MPS/CPU
+- **Data Type Optimization**: Uses float32 for MPS/CPU to prevent black image artifacts
+
+#### **Intelligent Output Management**
+- **Smart Filename Generation**: Auto-generates descriptive filenames including all parameters
+  - Example: `image_van_gogh_style_str0.7_guide18.0_steps40_stable_diffusion_v1_5.jpg`
+- **Parameter Preservation**: Filenames encode generation settings for reproducibility
+- **Collision Prevention**: Unique names prevent accidental overwrites
+
+#### **Robustness & Error Handling**
+- **Graceful Memory Management**: Improved error handling for memory optimization features
+- **Dependency Compatibility**: Fixed typer/click version conflicts
+- **Input Validation**: Better image preprocessing and format handling
+- **Comprehensive Logging**: Detailed debug information for troubleshooting
 
 ### Work towards increasing GPU memory efficiency
 

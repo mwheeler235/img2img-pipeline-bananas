@@ -1,9 +1,74 @@
 import os
+import re
 from typing import Generator, Tuple
 
 from PIL import Image
 
 from .constants import INPUT_IMAGE_DIR
+
+
+def generate_output_filename(
+    input_filename: str,
+    prompt: str = None,
+    strength: float = None,
+    guidance_scale: float = None,
+    num_inference_steps: int = None,
+    model_repo: str = None,
+) -> str:
+    """
+    Generates a descriptive output filename based on input parameters.
+    
+    Args:
+        input_filename: Original input filename
+        prompt: The style prompt used
+        strength: Strength parameter used
+        guidance_scale: Guidance scale used
+        num_inference_steps: Number of inference steps used
+        model_repo: Model repository used
+        
+    Returns:
+        str: Generated output filename
+    """
+    # Get base name without extension
+    base_name = os.path.splitext(input_filename)[0]
+    extension = os.path.splitext(input_filename)[1]
+    
+    # Clean prompt for filename (remove special characters, limit length)
+    if prompt:
+        clean_prompt = re.sub(r'[^\w\s-]', '', prompt)
+        clean_prompt = re.sub(r'[-\s]+', '_', clean_prompt)
+        clean_prompt = clean_prompt[:30]  # Limit length
+    else:
+        clean_prompt = "styled"
+    
+    # Extract model name from repo
+    if model_repo:
+        model_name = model_repo.split('/')[-1]
+        model_name = model_name.replace('-', '_')
+    else:
+        model_name = "unknown"
+    
+    # Build filename parts
+    parts = [base_name]
+    
+    if clean_prompt:
+        parts.append(clean_prompt)
+    
+    if strength is not None:
+        parts.append(f"str{strength:.1f}")
+    
+    if guidance_scale is not None:
+        parts.append(f"guide{guidance_scale:.1f}")
+    
+    if num_inference_steps is not None:
+        parts.append(f"steps{num_inference_steps}")
+    
+    parts.append(model_name)
+    
+    # Join parts and add extension
+    output_filename = "_".join(parts) + extension
+    
+    return output_filename
 
 
 def get_all_images() -> Generator[Tuple[Image.Image, Tuple[int, int], str], None, None]:
