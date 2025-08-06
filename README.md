@@ -1,9 +1,10 @@
  # img2img-pipeline
 
 Stable Diffusion img2img pipeline, supporting various models and images and 
-tested on NVIDIA / CUDA / MPS devices.
+tested on Apple MPS device.
 
-![repo banner](data/van_gogh_dolomiti_runner.jpg)
+<img src="https://github.com/mwheeler235/img2img-pipeline-bananas/blob/main/data/van_gogh_dolomiti_runner.png" width=100% height=100%>
+
 
 This pipeline:
 
