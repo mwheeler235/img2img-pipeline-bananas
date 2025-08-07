@@ -41,12 +41,19 @@ def generate_output_filename(
     else:
         clean_prompt = "styled"
     
-    # Extract model name from repo
+    # Extract model organization and name from repo
     if model_repo:
-        model_name = model_repo.split('/')[-1]
-        model_name = model_name.replace('-', '_')
+        if '/' in model_repo:
+            model_org, model_name = model_repo.split('/', 1)
+            # Clean up organization and model names for filename
+            model_org = model_org.replace('-', '_')
+            model_name = model_name.replace('-', '_')
+            model_identifier = f"{model_org}_{model_name}"
+        else:
+            # Handle case where there's no organization (just model name)
+            model_identifier = model_repo.replace('-', '_')
     else:
-        model_name = "unknown"
+        model_identifier = "unknown"
     
     # Build filename parts
     parts = [base_name]
@@ -63,7 +70,7 @@ def generate_output_filename(
     if num_inference_steps is not None:
         parts.append(f"steps{num_inference_steps}")
     
-    parts.append(model_name)
+    parts.append(model_identifier)
     
     # Join parts and add extension
     output_filename = "_".join(parts) + extension

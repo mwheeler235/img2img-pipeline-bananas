@@ -3,7 +3,7 @@
 Stable Diffusion img2img pipeline, supporting various models and images and 
 tested on Apple MPS device.
 
-<img src="https://github.com/mwheeler235/img2img-pipeline-bananas/blob/main/data/van_gogh_dolomiti_runner.png" width=100% height=100%>
+<img src="https://github.com/mwheeler235/img2img-pipeline-bananas/blob/main/data/pipeline_architecture_example.png" width=100% height=100%>
 
 
 This pipeline:
